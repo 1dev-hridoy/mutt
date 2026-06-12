@@ -9,7 +9,7 @@ import (
 
 var DB *gorm.DB
 
-func ConnectToDB() {
+func MustConnectToDB() {
 	var err error
 	dsn := os.Getenv("NEON_DB_CONNECTION_STRING")
 

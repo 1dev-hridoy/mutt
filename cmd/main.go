@@ -1,26 +1,20 @@
 package main
 
 import (
-	"os"
-
+	"github.com/dishan1223/mutt/consts"
 	"github.com/dishan1223/mutt/internal/config"
+	"github.com/dishan1223/mutt/server/routes"
 	"github.com/gofiber/fiber/v3"
 )
 
 func init() {
-	config.LoadEnv()
-	config.ConnectToDB()
+	config.MustLoadEnv()
+	config.MustConnectToDB()
 }
 
 func main() {
-	// app.Listen(":PORT")
-	PORT := ":" + os.Getenv("PORT")
-
+	PORT := consts.PORT
 	app := fiber.New()
-
-	app.Get("/", func(c fiber.Ctx) error {
-		return c.SendString("hello from mutt")
-	})
-
+	routes.Init(app)
 	app.Listen(PORT)
 }
