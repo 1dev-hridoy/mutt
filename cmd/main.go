@@ -14,7 +14,7 @@ func init() {
 	config.MustLoadEnv()
 	config.MustConnectToDB()
 	config.MustSyncDatabase()
-	service.MustInitJWT(config.MustGetEnv("JwtSecret"))
+	service.MustInitJWT(config.MustGetEnv("JWT_SECRET"))
 }
 
 func main() {

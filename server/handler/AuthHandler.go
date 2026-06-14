@@ -13,7 +13,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func AuthHandler(c fiber.Ctx) error {
+func SignUpHandler(c fiber.Ctx) error {
 	body := new(models.SignupRequest)
 
 	err := c.Bind().Body(body)
@@ -72,7 +72,7 @@ func AuthHandler(c fiber.Ctx) error {
 		Name:     "token",
 		Value:    token,
 		HTTPOnly: true,
-		// secure should be tuned on for production
+		// Secure should be tuned on for production
 		Secure:   false,
 		SameSite: "lax",
 		Path:     "/",

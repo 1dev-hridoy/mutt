@@ -15,4 +15,5 @@ func Init(a *fiber.App) {
 	app.Get("/ping", handler.Ping)
 
 	v1.Get("/ping", handler.Ping)
+	v1.Post("/signup", handler.SignUpHandler)
 }
