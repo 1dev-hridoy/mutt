@@ -18,11 +18,38 @@ type User struct {
 }
 
 type SignupRequest struct {
-	Username string `json:"username" validate:"required,max=70"`
+	Username string `json:"username" validate:"required,min=3,max=70"`
 	Email    string `json:"email" validate:"required,email,max=255"`
-	Password string `json:"password" validate:"required,min=8"`
+	Password string `json:"password" validate:"required,min=8,max=72"`
 	Phone    string `json:"phone" validate:"required,max=20"`
 	Plan     string `json:"plan,omitempty" validate:"omitempty,oneof=Free Pro Enterprise"`
+}
+
+type LoginRequest struct {
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required"`
+}
+
+type RefreshRequest struct {
+	RefreshToken string `json:"refresh_token" validate:"required"`
+}
+
+type UserResponse struct {
+	ID       uint   `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone"`
+	Plan     string `json:"plan"`
+}
+
+func (u *User) ToResponse() UserResponse {
+	return UserResponse{
+		ID:       u.ID,
+		Username: u.Username,
+		Email:    u.Email,
+		Phone:    u.Phone,
+		Plan:     u.Plan,
+	}
 }
 
 type Project struct {
