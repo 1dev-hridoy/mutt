@@ -3,8 +3,11 @@ package models
 import (
 	"time"
 
+	"github.com/go-playground/validator/v10"
 	"gorm.io/gorm"
 )
+
+var validate = validator.New()
 
 type Project struct {
 	gorm.Model
@@ -35,4 +38,103 @@ type Error struct {
 	Severity     string    `json:"severity" gorm:"type:varchar(20);default:'error'"` // error|warning|info
 	Notified     bool      `json:"notified" gorm:"default:false"`
 	OccurredAt   time.Time `json:"occurred_at"`
+}
+
+type CreateProjectRequest struct {
+	Name string `json:"name" validate:"required,min=1,max=100"`
+}
+
+type UpdateProjectRequest struct {
+	Name   *string `json:"name,omitempty" validate:"omitempty,min=1,max=100"`
+	Notify *bool   `json:"notify,omitempty"`
+}
+
+type ProjectResponse struct {
+	ID        uint      `json:"id"`
+	Name      string    `json:"name"`
+	Plan      string    `json:"plan"`
+	Notify    bool      `json:"notify"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+type ProjectWithKeyResponse struct {
+	ProjectResponse
+	APIKey string `json:"api_key"`
+}
+
+func (p *Project) ToResponse() ProjectResponse {
+	return ProjectResponse{
+		ID:        p.ID,
+		Name:      p.Name,
+		Plan:      p.Plan,
+		Notify:    p.Notify,
+		CreatedAt: p.CreatedAt,
+	}
+}
+
+type UpdateErrorGroupRequest struct {
+	Status string `json:"status" validate:"required,oneof=critical resolved recovered"`
+}
+
+type ErrorGroupResponse struct {
+	ID         uint      `json:"id"`
+	Title      string    `json:"title"`
+	Status     string    `json:"status"`
+	Count      int       `json:"count"`
+	LastSeenAt time.Time `json:"last_seen_at"`
+	CreatedAt  time.Time `json:"created_at"`
+}
+
+func (eg *ErrorGroup) ToResponse() ErrorGroupResponse {
+	return ErrorGroupResponse{
+		ID:         eg.ID,
+		Title:      eg.Title,
+		Status:     eg.Status,
+		Count:      eg.Count,
+		LastSeenAt: eg.LastSeenAt,
+		CreatedAt:  eg.CreatedAt,
+	}
+}
+
+type ErrorResponse struct {
+	ID         uint      `json:"id"`
+	Log        string    `json:"log"`
+	StackTrace string    `json:"stack_trace"`
+	Severity   string    `json:"severity"`
+	Notified   bool      `json:"notified"`
+	OccurredAt time.Time `json:"occurred_at"`
+}
+
+func (e *Error) ToResponse() ErrorResponse {
+	return ErrorResponse{
+		ID:         e.ID,
+		Log:        e.Log,
+		StackTrace: e.StackTrace,
+		Severity:   e.Severity,
+		Notified:   e.Notified,
+		OccurredAt: e.OccurredAt,
+	}
+}
+
+type IngestRequest struct {
+	Title      string `json:"title" validate:"required,max=500"`
+	Log        string `json:"log" validate:"required"`
+	StackTrace string `json:"stack_trace"`
+	Severity   string `json:"severity" validate:"omitempty,oneof=error warning info"`
+}
+
+func (r *IngestRequest) Validate() error {
+	return validate.Struct(r)
+}
+
+func (r *CreateProjectRequest) Validate() error {
+	return validate.Struct(r)
+}
+
+func (r *UpdateProjectRequest) Validate() error {
+	return validate.Struct(r)
+}
+
+func (r *UpdateErrorGroupRequest) Validate() error {
+	return validate.Struct(r)
 }

@@ -1,9 +1,6 @@
 package models
 
-import (
-	"github.com/lib/pq"
-	"gorm.io/gorm"
-)
+import "gorm.io/gorm"
 
 type User struct {
 	gorm.Model
@@ -13,8 +10,6 @@ type User struct {
 	Plan     string `json:"plan" gorm:"not null;type:varchar(20);default:'Free'"`
 
 	Phone string `json:"phone" gorm:"type:varchar(20);uniqueIndex;not null" validate:"required,max=20"`
-
-	ProjectID pq.Int64Array `json:"project_id" gorm:"type:integer[];default:'{}'"`
 }
 
 type SignupRequest struct {
