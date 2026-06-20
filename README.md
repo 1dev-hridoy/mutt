@@ -32,3 +32,5 @@ Most error tracking tools are either expensive or lack transparency. Mutt is bui
 ## Contributing
 
 Contributions are welcome from anyone. Feel free to open issues or submit pull requests.
+
+To understand the system architecture, data flows, and design decisions, see [Architecture Diagram](diagram/diagram.md).
