@@ -20,7 +20,7 @@ func init() {
 }
 
 func main() {
-	PORT := consts.PORT
+	PORT := consts.GetPort()
 	app := fiber.New()
 
 	allowedOrigins := strings.Split(config.MustGetEnv("ALLOWED_ORIGINS"), ",")
