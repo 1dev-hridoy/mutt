@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/dishan1223/mutt/consts"
 	"github.com/dishan1223/mutt/internal/config"
 	"github.com/dishan1223/mutt/internal/service"
@@ -21,11 +23,13 @@ func main() {
 	PORT := consts.PORT
 	app := fiber.New()
 
+	allowedOrigins := strings.Split(config.MustGetEnv("ALLOWED_ORIGINS"), ",")
+
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
-		AllowCredentials: false, // Must be false when AllowOrigins is "*"
+		AllowOrigins:     allowedOrigins,
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Mutt-Key"},
+		AllowCredentials: true,
 	}))
 
 	routes.Init(app)

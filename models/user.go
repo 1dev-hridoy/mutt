@@ -7,9 +7,7 @@ type User struct {
 	Username string `json:"username" gorm:"not null;type:varchar(70)"`
 	Email    string `json:"email" gorm:"type:varchar(255);uniqueIndex;not null" validate:"required,email,max=255"`
 	Password string `json:"-" gorm:"not null" validate:"required"`
-	Plan     string `json:"plan" gorm:"not null;type:varchar(20);default:'Free'"`
-
-	Phone string `json:"phone" gorm:"type:varchar(20);uniqueIndex;not null" validate:"required,max=20"`
+	Phone    string `json:"phone" gorm:"type:varchar(20);uniqueIndex;not null" validate:"required,max=20"`
 }
 
 type SignupRequest struct {
@@ -17,7 +15,6 @@ type SignupRequest struct {
 	Email    string `json:"email" validate:"required,email,max=255"`
 	Password string `json:"password" validate:"required,min=8,max=72"`
 	Phone    string `json:"phone" validate:"required,max=20"`
-	Plan     string `json:"plan,omitempty" validate:"omitempty,oneof=Free Pro Enterprise"`
 }
 
 type LoginRequest struct {
@@ -34,7 +31,6 @@ type UserResponse struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Phone    string `json:"phone"`
-	Plan     string `json:"plan"`
 }
 
 func (u *User) ToResponse() UserResponse {
@@ -43,6 +39,5 @@ func (u *User) ToResponse() UserResponse {
 		Username: u.Username,
 		Email:    u.Email,
 		Phone:    u.Phone,
-		Plan:     u.Plan,
 	}
 }

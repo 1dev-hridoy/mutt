@@ -13,9 +13,7 @@ type Project struct {
 	gorm.Model
 	UserID uint   `json:"user_id" gorm:"not null;index"`
 	Name   string `json:"name" gorm:"not null;type:varchar(100)"`
-	APIKey string `json:"-" gorm:"not null;uniqueIndex;type:varchar(255)"` // bcrypt hash
-	Plan   string `json:"plan" gorm:"not null;type:varchar(20);default:'Free'"`
-	Notify bool   `json:"notify" gorm:"default:false"`
+	APIKey string `json:"-" gorm:"not null;uniqueIndex;type:varchar(255)"` // SHA-256 hash
 }
 
 // Error groups similar errors together (fingerprint-based)
@@ -27,6 +25,7 @@ type ErrorGroup struct {
 	Status      string    `json:"status" gorm:"not null;type:varchar(20);default:'critical'"` // critical|resolved|recovered
 	Count       int       `json:"count" gorm:"default:1"`
 	LastSeenAt  time.Time `json:"last_seen_at"`
+	Notified    bool      `json:"notified" gorm:"default:false"` // whether notification has been sent for this group
 }
 
 type Error struct {
@@ -45,15 +44,12 @@ type CreateProjectRequest struct {
 }
 
 type UpdateProjectRequest struct {
-	Name   *string `json:"name,omitempty" validate:"omitempty,min=1,max=100"`
-	Notify *bool   `json:"notify,omitempty"`
+	Name *string `json:"name,omitempty" validate:"omitempty,min=1,max=100"`
 }
 
 type ProjectResponse struct {
 	ID        uint      `json:"id"`
 	Name      string    `json:"name"`
-	Plan      string    `json:"plan"`
-	Notify    bool      `json:"notify"`
 	CreatedAt time.Time `json:"created_at"`
 }
 
@@ -66,8 +62,6 @@ func (p *Project) ToResponse() ProjectResponse {
 	return ProjectResponse{
 		ID:        p.ID,
 		Name:      p.Name,
-		Plan:      p.Plan,
-		Notify:    p.Notify,
 		CreatedAt: p.CreatedAt,
 	}
 }
@@ -83,6 +77,7 @@ type ErrorGroupResponse struct {
 	Count      int       `json:"count"`
 	LastSeenAt time.Time `json:"last_seen_at"`
 	CreatedAt  time.Time `json:"created_at"`
+	Notified   bool      `json:"notified"`
 }
 
 func (eg *ErrorGroup) ToResponse() ErrorGroupResponse {
@@ -93,6 +88,7 @@ func (eg *ErrorGroup) ToResponse() ErrorGroupResponse {
 		Count:      eg.Count,
 		LastSeenAt: eg.LastSeenAt,
 		CreatedAt:  eg.CreatedAt,
+		Notified:   eg.Notified,
 	}
 }
 

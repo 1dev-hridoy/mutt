@@ -5,6 +5,7 @@ import (
 
 	"github.com/dishan1223/mutt/internal/config"
 	"github.com/dishan1223/mutt/internal/service"
+	"github.com/dishan1223/mutt/internal/utils"
 	"github.com/dishan1223/mutt/models"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
@@ -26,7 +27,7 @@ func SignUpHandler(c fiber.Ctx) error {
 	if err := validate.Struct(body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error":   "Validation failed",
-			"details": formatValidationErrors(err),
+			"details": utils.FormatValidationErrors(err),
 		})
 	}
 
@@ -56,7 +57,6 @@ func SignUpHandler(c fiber.Ctx) error {
 		Email:    body.Email,
 		Password: hashedPassword,
 		Phone:    body.Phone,
-		Plan:     "Free",
 	}
 
 	result := config.DB.Create(&user)
@@ -81,7 +81,7 @@ func LoginHandler(c fiber.Ctx) error {
 	if err := validate.Struct(body); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error":   "Validation failed",
-			"details": formatValidationErrors(err),
+			"details": utils.FormatValidationErrors(err),
 		})
 	}
 
@@ -239,29 +239,4 @@ func clearAuthCookies(c fiber.Ctx) {
 		Path:     "/api/v1/auth/refresh",
 		MaxAge:   -1,
 	})
-}
-
-func formatValidationErrors(err error) map[string]string {
-	if validationErrors, ok := err.(validator.ValidationErrors); ok {
-		errors := make(map[string]string)
-		for _, e := range validationErrors {
-			field := e.Field()
-			switch e.Tag() {
-			case "required":
-				errors[field] = "This field is required"
-			case "email":
-				errors[field] = "Invalid email format"
-			case "min":
-				errors[field] = "Too short"
-			case "max":
-				errors[field] = "Too long"
-			case "oneof":
-				errors[field] = "Invalid value"
-			default:
-				errors[field] = "Invalid value"
-			}
-		}
-		return errors
-	}
-	return map[string]string{"error": err.Error()}
 }

@@ -10,23 +10,17 @@ import (
 )
 
 func GenerateAPIKey() (string, string) {
-	// make() is used to create a new slice of bytes with a length of consts.API_KEY_BYTES.
 	b := make([]byte, consts.API_KEY_BYTES)
-
-	// We are using rand.Read() to fill the byte slice with random data.
-	// This is a cryptographically secure way to generate random bytes.
 	_, err := rand.Read(b)
 	if err != nil {
-		log.Error("Failed To Generate API Key", "error", err)
+		log.Error("Failed to generate API key", "error", err)
 		return "", ""
 	}
-
 	raw := hex.EncodeToString(b)
-
 	return raw, HashAPIKey(raw)
 }
 
-func HashAPIKey(Key string) string {
-	h := sha256.Sum256([]byte(Key))
+func HashAPIKey(key string) string {
+	h := sha256.Sum256([]byte(key))
 	return hex.EncodeToString(h[:])
 }
