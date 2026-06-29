@@ -29,9 +29,12 @@ func init() {
 	config.MustSyncDatabase()
 	config.MustConnectRedis()
 	service.MustInitJWT(config.MustGetEnv("JWT_SECRET"))
+	config.InitTracing()
 }
 
 func main() {
+	defer config.ShutdownTracing()
+
 	PORT := consts.GetPort()
 	app := fiber.New()
 

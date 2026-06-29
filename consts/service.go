@@ -2,8 +2,17 @@ package consts
 
 import "github.com/dishan1223/mutt/internal/config"
 
-var (
-	API_KEY_BYTES   = config.MustGetEnv("API_KEY_BYTES")
-	MAX_LOG_SIZE    = config.MustGetEnv("MAX_LOG_SIZE")
-	MAX_STACK_TRACE = config.MustGetEnv("MAX_STACK_TRACE")
-)
+// All the env variables that needs to be stored in this file
+// shall all be returned by a function.
+// Make sure functions are named in a way that they are self explanatory.
+func GetAPIKeyBytes() string {
+	return config.MustGetEnv("API_KEY_BYTES")
+}
+
+func GetMaxLogSize() string {
+	return config.MustGetEnv("MAX_LOG_SIZE")
+}
+
+func GetMaxStackTrace() string {
+	return config.MustGetEnv("MAX_STACK_TRACE")
+}

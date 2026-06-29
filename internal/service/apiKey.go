@@ -11,7 +11,10 @@ import (
 )
 
 func GenerateAPIKey() (string, string) {
-	API_KEY_BYTES, err := strconv.Atoi(consts.API_KEY_BYTES)
+	// All env variables that are returned by a function (e.g., GetAPIKeyBytes) are
+	// returning a string. So, we need to convert them to int before using them.
+	// strconv.Atoi is used to convert the string to int. If the conversion fails, it returns an error.
+	API_KEY_BYTES, err := strconv.Atoi(consts.GetAPIKeyBytes())
 	if err != nil {
 		log.Error("Invalid API key size", "error", err)
 		return "", ""

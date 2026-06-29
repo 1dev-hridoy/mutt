@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/uptrace/opentelemetry-go-extra/otelgorm"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -25,5 +26,12 @@ func MustConnectToDB() {
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
+	}
+
+	// Register the otelgorm plugin for tracing database operations.
+	// This is for observability and monitoring purposes.
+	// It allows us to trace database queries and operations.
+	if err := DB.Use(otelgorm.NewPlugin()); err != nil {
+		panic("failed to register otelgorm plugin: " + err.Error())
 	}
 }

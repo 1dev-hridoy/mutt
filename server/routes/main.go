@@ -7,12 +7,16 @@ import (
 	"github.com/dishan1223/mutt/server/handler"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/limiter"
+
+	fiberotel "github.com/gofiber/contrib/v3/otel"
 )
 
 var app *fiber.App
 
 func Init(a *fiber.App) {
 	app = a
+
+	app.Use(fiberotel.Middleware())
 
 	v1 := app.Group("/api/v1")
 

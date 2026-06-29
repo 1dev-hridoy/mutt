@@ -13,7 +13,7 @@ import (
 // the fields if they exceed the limits.
 // If any error occurs during this process (e.g., invalid size values), it returns an error.
 func ClampIngestRequestFields(body *models.IngestRequest) error {
-	maxLogSize, err := strconv.Atoi(consts.MAX_LOG_SIZE)
+	maxLogSize, err := strconv.Atoi(consts.GetMaxLogSize())
 	if err != nil {
 		return err
 	}
@@ -21,7 +21,7 @@ func ClampIngestRequestFields(body *models.IngestRequest) error {
 		body.Log = body.Log[:maxLogSize]
 	}
 
-	maxStackTrace, err := strconv.Atoi(consts.MAX_STACK_TRACE)
+	maxStackTrace, err := strconv.Atoi(consts.GetMaxStackTrace())
 	if err != nil {
 		return err
 	}

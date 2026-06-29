@@ -8,7 +8,7 @@ import (
 )
 
 func HashPassword(p string) (string, error) {
-	HashCost, err := strconv.Atoi(consts.HASH_COST)
+	HashCost, err := strconv.Atoi(consts.GetHashCost())
 	if err != nil {
 		return "", err
 	}
