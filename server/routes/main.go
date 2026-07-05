@@ -46,6 +46,40 @@ func Init(a *fiber.App) {
 	errors.Patch("/:errorGroupId", handler.UpdateErrorGroupHandler)
 	errors.Delete("/:errorGroupId", handler.DeleteErrorGroupHandler)
 
+	// ponytail: 5 exports/min per user, 2 imports/min per user
+	backupExportRateLimit := limiter.New(limiter.Config{
+		Max:        5,
+		Expiration: 1 * time.Minute,
+		KeyGenerator: func(c fiber.Ctx) string {
+			userID := c.Locals("userID").(uint)
+			return "backup-export:" + strconv.FormatUint(uint64(userID), 10)
+		},
+		LimitReached: func(c fiber.Ctx) error {
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"error":       "Export rate limit exceeded",
+				"retry_after": 60,
+			})
+		},
+	})
+
+	backupImportRateLimit := limiter.New(limiter.Config{
+		Max:        2,
+		Expiration: 1 * time.Minute,
+		KeyGenerator: func(c fiber.Ctx) string {
+			userID := c.Locals("userID").(uint)
+			return "backup-import:" + strconv.FormatUint(uint64(userID), 10)
+		},
+		LimitReached: func(c fiber.Ctx) error {
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"error":       "Import rate limit exceeded",
+				"retry_after": 60,
+			})
+		},
+	})
+
+	v1.Get("/backup", middleware.AuthRequired, backupExportRateLimit, handler.ExportBackupHandler)
+	v1.Post("/backup/import", middleware.AuthRequired, backupImportRateLimit, handler.ImportBackupHandler)
+
 	// Rate limiter provided by GoFiber.
 	// Docs: https://docs.gofiber.io/blog/fiber-v3-rate-limiting-guide
 	ingestRateLimit := limiter.New(limiter.Config{
