@@ -67,6 +67,8 @@ func ExportBackupHandler(c fiber.Ctx) error {
 	return c.Send(data)
 }
 
+// TODO: Refactor this function to use utils/service components to make the codebase clean and easy to maintain.
+// This function currently has too many tasks and responsibilities, which makes it hard to read and maintain.
 func ImportBackupHandler(c fiber.Ctx) error {
 	userID := c.Locals("userID").(uint)
 
