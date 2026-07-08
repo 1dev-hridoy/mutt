@@ -14,6 +14,8 @@ type Project struct {
 	UserID uint   `json:"user_id" gorm:"not null;index"`
 	Name   string `json:"name" gorm:"not null;type:varchar(100)"`
 	APIKey string `json:"-" gorm:"not null;uniqueIndex;type:varchar(255)"` // SHA-256 hash
+	Notify bool   `json:"notify" gorm:"default:false"`
+	Addr   string `json:"addr" gorm:"type:varchar(255)"` // Slack webhook URL or email address
 }
 
 // Error groups similar errors together (fingerprint-based)
@@ -40,17 +42,23 @@ type Error struct {
 }
 
 type CreateProjectRequest struct {
-	Name string `json:"name" validate:"required,min=1,max=100"`
+	Name   string `json:"name" validate:"required,min=1,max=100"`
+	Notify bool   `json:"notify"`
+	Addr   string `json:"addr" validate:"omitempty,max=255"`
 }
 
 type UpdateProjectRequest struct {
-	Name *string `json:"name,omitempty" validate:"omitempty,min=1,max=100"`
+	Name   *string `json:"name,omitempty" validate:"omitempty,min=1,max=100"`
+	Notify *bool   `json:"notify,omitempty"`
+	Addr   *string `json:"addr,omitempty" validate:"omitempty,max=255"`
 }
 
 type ProjectResponse struct {
 	ID        uint      `json:"id"`
 	Name      string    `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
+	Notify    bool      `json:"notify"`
+	Addr      string    `json:"addr"`
 }
 
 type ProjectWithKeyResponse struct {
@@ -63,6 +71,8 @@ func (p *Project) ToResponse() ProjectResponse {
 		ID:        p.ID,
 		Name:      p.Name,
 		CreatedAt: p.CreatedAt,
+		Notify:    p.Notify,
+		Addr:      p.Addr,
 	}
 }
 

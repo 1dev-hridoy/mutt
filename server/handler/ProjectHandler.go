@@ -40,6 +40,8 @@ func CreateProjectHandler(c fiber.Ctx) error {
 		UserID: userID,
 		Name:   body.Name,
 		APIKey: hashedKey,
+		Notify: body.Notify,
+		Addr:   body.Addr,
 	}
 
 	if err := config.DB.Create(&project).Error; err != nil {
@@ -139,6 +141,22 @@ func UpdateProjectHandler(c fiber.Ctx) error {
 
 	if body.Name != nil {
 		if err := config.DB.Model(&project).Update("name", *body.Name).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to update project",
+			})
+		}
+	}
+
+	if body.Notify != nil {
+		if err := config.DB.Model(&project).Update("notify", *body.Notify).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+				"error": "Failed to update project",
+			})
+		}
+	}
+
+	if body.Addr != nil {
+		if err := config.DB.Model(&project).Update("addr", *body.Addr).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Failed to update project",
 			})
