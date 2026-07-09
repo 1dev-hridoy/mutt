@@ -139,30 +139,24 @@ func UpdateProjectHandler(c fiber.Ctx) error {
 		})
 	}
 
+	updates := make(map[string]interface{})
 	if body.Name != nil {
-		if err := config.DB.Model(&project).Update("name", *body.Name).Error; err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Failed to update project",
-			})
-		}
+		updates["name"] = *body.Name
 	}
-
 	if body.Notify != nil {
-		if err := config.DB.Model(&project).Update("notify", *body.Notify).Error; err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"error": "Failed to update project",
-			})
-		}
+		updates["notify"] = *body.Notify
 	}
-
 	if body.Addr != nil {
-		if err := config.DB.Model(&project).Update("addr", *body.Addr).Error; err != nil {
+		updates["addr"] = *body.Addr
+	}
+
+	if len(updates) > 0 {
+		if err := config.DB.Model(&project).Updates(updates).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"error": "Failed to update project",
 			})
 		}
 	}
-
 	config.DB.First(&project, project.ID)
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"project": project.ToResponse(),

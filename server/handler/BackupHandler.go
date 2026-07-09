@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/dishan1223/mutt/consts"
 	"github.com/dishan1223/mutt/internal/config"
@@ -96,15 +95,17 @@ func ImportBackupHandler(c fiber.Ctx) error {
 
 	// Handle gzip-compressed imports
 	var reader io.Reader = src
-	if strings.HasSuffix(file.Filename, ".gz") {
-		gz, err := gzip.NewReader(src)
-		if err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-				"error": "Invalid gzip file",
-			})
+	var magic [2]byte
+	if _, err := io.ReadFull(src, magic[:]); err == nil {
+		reader = io.MultiReader(bytes.NewReader(magic[:]), src)
+		if magic[0] == 0x1f && magic[1] == 0x8b {
+			gz, err := gzip.NewReader(reader)
+			if err != nil {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid gzip file"})
+			}
+			defer gz.Close()
+			reader = gz
 		}
-		defer gz.Close()
-		reader = gz
 	}
 
 	data, err := io.ReadAll(reader)
